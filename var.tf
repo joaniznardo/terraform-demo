@@ -11,9 +11,9 @@ variable "nom_domini" {
 
 variable "nombre_instancies" {
   type = number
-  default = 2
+## default = 2
 ## normally for server 
-##  default = 1
+  default = 1
 }
 
 variable "account" {
