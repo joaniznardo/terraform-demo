@@ -1,5 +1,10 @@
 terraform {
-  required_version = ">= 0.12"
+# required_version = ">= 0.12"
+  required_providers {
+    libvirt = {
+      source = "dmacvicar/libvirt"
+    }
+  }
 }
 
 ##- Hypervisor
@@ -53,8 +58,8 @@ resource "libvirt_volume" "centos7_qcow2" {
   ##- linked clone!!!! estalvia espai - possible perill de que desaparega la base
   ##- genial si se disposa de 4 bases: ubuntu/centos x server/desktop
   ##> alternatiu < base_volume_name = "centos7.qcow2"
-  base_volume_name = "centos7.qcow2"
-  ##base_volume_name = "CentOS-7-x86_64-GenericCloud.qcow2"
+  ##base_volume_name = "centos7.qcow2"
+  base_volume_name = "CentOS-7-x86_64-GenericCloud.qcow2"
   base_volume_pool = "default"
   ##- ready for multi-instancies
   count = var.nombre_instancies
@@ -87,6 +92,7 @@ resource "libvirt_domain" "dom" {
   ##  network_name = "default"
     network_name = "tf-${var.nom_host}-${var.account}"
     mac    = "00:11:22:33:88:${count.index}"
+  ## no engega :(  wait_for_lease = true
   }
 
   boot_device {
@@ -116,5 +122,8 @@ resource "libvirt_domain" "dom" {
 
 # Output Server IP
 output "ip" {
-  value = libvirt_domain.dom.*.network_interface.0.addresses
+  value = libvirt_domain.dom.*.network_interface.0.addresses[0]
+  #### nope - value = libvirt_domain.dom[count.index].network_interface.0.addresses[0]
+  #value = libvirt_domain.dom
+  #-- value = "${libvirt_domain.dom}"
 }
